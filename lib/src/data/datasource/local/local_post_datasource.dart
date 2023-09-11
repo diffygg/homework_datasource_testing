@@ -59,9 +59,16 @@ class LocalPostDatasource {
 
     final List<PostModel> result = [];
 
-    data!.forEach((element) {
-      result.add(PostModel.fromMap(element));
-    });
+    for (int i = 0; i < data!.length; i = i + 1) {
+      result.add(PostModel(
+        id: data[i]['id'] as int,
+        ownerId: data[i]['ownerId'] as int,
+        title: data[i]['title'] as String,
+        data: data[i]['data'] as String,
+        publishedAt: DateTime.parse(data[i]['publishedAt'] as String),
+        updatedAt: DateTime.parse(data[i]['updatedAt'] as String),
+      ));
+    }
 
     return result;
   }
