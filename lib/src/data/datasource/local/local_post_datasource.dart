@@ -50,11 +50,29 @@ class LocalPostDatasource {
     );
   }
 
-  Future<List<PostModel>> getAllPosts() {
-    throw UnimplementedError();
+  Future<List<PostModel>> getAllPosts() async {
+    final List<Map<String, Object?>>? data = await sqfliteModule.database?.query(postsTable);
+
+    if (data == null && data?.length == 0) {
+      throw NoDataError();
+    }
+
+    final List<PostModel> result = [];
+
+    data!.forEach((element) {
+      result.add(PostModel.fromMap(element));
+    });
+
+    return result;
   }
 
-  Future<Unit> deletePost() {
-    throw UnimplementedError();
+  Future<Unit> deletePost({required int id}) async {
+    final int? result = await sqfliteModule.database?.delete(postsTable, where: 'id == $id');
+
+    if (result == null) {
+      throw NoDataError();
+    }
+
+    return unit;
   }
 }

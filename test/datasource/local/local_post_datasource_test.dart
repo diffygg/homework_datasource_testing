@@ -53,5 +53,90 @@ Future<void> main() async {
       expect(saveTest, unit, reason: 'Save does`t work correct');
       expect(getTest, postModel, reason: 'Get does`t match correct model');
     });
+    test('Get All test', () async {
+      // act
+      final SqfliteModule sqfliteModule = services<SqfliteModule>();
+      await sqfliteModule.database?.delete('Posts');
+
+      final List<PostModel> listPostModels = [
+        PostModel(
+          id: 1,
+          ownerId: 1,
+          title: 'title1',
+          data: 'data1',
+          publishedAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        ),
+        PostModel(
+          id: 2,
+          ownerId: 2,
+          title: 'title2',
+          data: 'data2',
+          publishedAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        ),
+        PostModel(
+          id: 3,
+          ownerId: 3,
+          title: 'title3',
+          data: 'data3',
+          publishedAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        ),
+      ];
+
+      final LocalPostDatasource localPostDatasource = services<LocalPostDatasource>();
+
+      // arrange
+      listPostModels.forEach((element) async {
+        await localPostDatasource.savePost(element);
+      });
+
+      Future<List<PostModel>?> Function() getAllPosts = () async {
+        try {
+          return await localPostDatasource.getAllPosts();
+        } catch (_) {
+          return null;
+        }
+      };
+
+      final getAllPostTest = await getAllPosts();
+
+      // assert
+      expect(getAllPostTest, listPostModels, reason: 'Get doesn`t match correct list of post models');
+    });
+
+    test('Delete test', () async {
+      // act
+      final SqfliteModule sqfliteModule = services<SqfliteModule>();
+      await sqfliteModule.database?.delete('Posts');
+
+      final PostModel postModel = PostModel(
+        id: 1,
+        ownerId: 1,
+        title: 'title1',
+        data: 'data1',
+        publishedAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+
+      final LocalPostDatasource localPostDatasource = services<LocalPostDatasource>();
+      await localPostDatasource.savePost(postModel);
+
+      // arrange
+
+      Future<Unit?> Function() deletePost = () async {
+        try {
+          return await localPostDatasource.deletePost(id: postModel.id);
+        } catch (_) {
+          return null;
+        }
+      };
+
+      final deletePostTest = await deletePost();
+
+      // assert
+      expect(deletePostTest, unit, reason: 'Delete doesn`t work correct');
+    });
   });
 }
